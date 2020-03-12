@@ -8,8 +8,7 @@ def create_new_n_board(n):
         "queens": queens,
         "row": 0,
         "solutions": 0,
-        "q_coordinates": [],
-        "number_queens": 0
+        "x_coordinate": [0, 0, 0, 0],
     }
     return begin
 
@@ -21,22 +20,24 @@ def print_board(board):
 
 #function to check if board == goal state
 def check_n_queens(state):
-    num = state["number_queens"]
-    q_coords = state["q_coordinates"]
-    print("coords: ", state["q_coordinates"])
+    num = state["row"]
+    q_coords = state["x_coordinate"]
 
+    #for every queen on the board, check against every other queen
     for i in range(num):
-        for j in range(i, num):
-            print("first coord: ", q_coords[i], " second coord: ", q_coords[j])
-            #check if x, y clashes with any other pairs
-            if(q_coords[i][0] == q_coords[j][0]):
+        for j in range(i + 1, num):
+            #check if queens are clashing
+            if(q_coords[i] == q_coords[j]):
                 return False
-            if (q_coords[i][1] == q_coords[j][1]):
-                return False
-    
+            else:
+            #check diagonals
+                x_dist = abs(q_coords[i] - q_coords[j])
+                y_dist = abs(i - j)
+                #gradient = rise / run - if gradient == 1, then queens are on same diagonal
+                gradient = y_dist / x_dist
+                if(abs(gradient) == 1):
+                    return False
     return True
-
-
 
 
 def breadth_first_search(board, n):
@@ -58,29 +59,23 @@ def breadth_first_search(board, n):
         current_state = queue.get()
         current_queens = current_state["queens"]
         current_row = current_state["row"]
-        current_coords = current_state["q_coordinates"]
-        current_number_queens = current_state["number_queens"]
+        current_coords = current_state["x_coordinate"]
         
         for i in range(n):
             if current_row >= n:
                 continue
-            #copy the current state, into a new board
+            # copy the current board and placed queen coordinates into new data structures
             new_queens = copy.deepcopy(current_queens)
+            new_coords = copy.deepcopy(current_coords)
 
-            #place the new queen on the new board
+            # place the new queen on the new board
             new_queens[current_row][i] = queen
-            new_queen_coords = (current_row, i)
-            print("new coords: ", new_queen_coords)
-            print("current coords: ", current_coords)
-            new_number_queens = current_number_queens + 1
+            new_coords[current_row] = i
             
-            #if this board has already been explored, then do not add back into queue
+            # if this board has already been explored, then do not add back into queue
             if str(new_queens) in explored:
                 continue
-
-            # current_coords[current_row] = new_queen_coords
         
-           
             # print_board(new_queens)
 
             #create a new state to go in the queue, add 1 to the row to increment for next time
@@ -88,11 +83,10 @@ def breadth_first_search(board, n):
                 "queens": new_queens,
                 "row": current_row + 1,
                 "solutions": 0,
-                "q_coordinates": current_coords,
-                "number_queens": new_number_queens,
+                "x_coordinate": new_coords,
             }
 
-            if new_number_queens == n:
+            if (current_row + 1) == n:
                 #check goal state
                 if check_n_queens(new_state):
                     print("goal state!")
@@ -104,12 +98,7 @@ def breadth_first_search(board, n):
             #record the current board in the 'explored' dict - make sure not to explore it again
             explored[str(new_queens)] = True
 
-
 begin = create_new_n_board(4)
 
 breadth_first_search(begin, 4)
-
-
-#i need to work out how to save a board's queens coords correctly for each state without overwriting
-# then fix the find goal state function
 
