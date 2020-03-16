@@ -1,14 +1,15 @@
 from queue import Queue
 import copy
 import time
+import random
 
 class QueensBoard:
-
     def __init__(self, n,  row=0, queens=[], x_coordinate=[]):
         self.n = n
         self.queens = queens
         self.row = row
         self.x_coordinate = x_coordinate
+        self.positions = []
 
     def create_board(self):
         self.queens = [[0 for i in range(self.n)] for j in range(self.n)]
@@ -20,7 +21,7 @@ class QueensBoard:
             print(self.queens[i])
         print()
 
-    def check_n_queens(self):
+    def bfs_check_collisons(self):
     #for every queen on the board, check against every other queen
         for i in range(self.n):
             for j in range(i + 1, self.n):
@@ -41,7 +42,7 @@ class QueensBoard:
         number_solutions = 0
         #1 value to denote a queen placed on a board of 0's
         queen = 1
-        #dict object to store all visited boards
+        #positions object to store all visited boards
         explored = {
             str(self.queens): True,
         }
@@ -77,9 +78,7 @@ class QueensBoard:
 
                 if (current_row + 1) == self.n:
                     #check goal state
-                    result = new_state.check_n_queens()
-                    
-                    
+                    result = new_state.bfs_check_collisons()
                     if result and self.n <= 6:
                         print("new goal state!")
                         number_solutions += 1
@@ -90,14 +89,82 @@ class QueensBoard:
                 #add this new board into the queue
                 queue.put(new_state)
 
-                #record the current board in the 'explored' dict - make sure not to explore it again
+                #record the current board in the 'explored' positions - make sure not to explore it again
                 explored[str(new_queens)] = True
         return number_solutions
+    
 
 
-board = QueensBoard(1)
+    def hillclimb(self):
+        #step 1: initalise random board with all N Queens on the board
+        for queen in self.queens:
+            col = random.randint(0, self.n-1)
+            row = random.randint(0, self.n-1)
+            #if value is already a queen
+            if self.queens[row][col] == 1:
+                #re-randomise the col and row values
+                col = random.randint(0, self.n-1)
+                row = random.randint(0, self.n-1)
+            self.queens[row][col] = 1
+            xy = [row, col]
+            self.positions.append(xy)
+        self.print_board()
+        print(self.positions)
+        #step 2: calculate the error cost of the random board
+        cost = self.cost_function()
+        print("cost: ", cost)
+        self.find_neighbors()
+        #step 3: find some neighbors close to this solution (move queens)
+        #step 4: evaluate neighbors - if cost is closer to zero, move to that board
+        #cost function - try to get to zero
+        # value of cost == number of queens that are attacking each other - try to get to zero
+    
+    def cost_function(self):
+        cost = 0
+        #calculate the number of times queens are colliding with each other
+        for i in range(self.n):
+            for j in range(i+ 1, self.n):
+                #check if queens in same row
+                if self.positions[i][0] == self.positions[j][0]:
+                    cost += 1
+                #check if queens in same column
+                if self.positions[i][1] == self.positions[j][1]:
+                    cost += 1
+                #check diagonals
+                x_dist = abs(self.positions[i][0] - self.positions[j][0])
+                y_dist = abs(self.positions[i][1] - self.positions[j][1])
+                # gradient = rise / run - if gradient == 1, then queens are on same diagonal
+                if x_dist == 0:
+                    #avoid division by zero - if zero, then definitely not on diagonals
+                    continue
+                gradient = y_dist / x_dist
+                if(abs(gradient) == 1):
+                    cost += 1                         
+        return cost
+
+    def find_neighbors(self):
+        #function to find a similar solution to the previous solution
+        # new_positions = []
+        for i in range(self.n):
+            xy = self.positions[i]
+            if xy[0] < self.n:
+                xy[0] += 1
+            elif xy[0] > 0:
+                xy[0] -= 1
+            if
+            xy[1] += 1 
+            self.positions[i] = xy
+        print(self.positions)
+        print(self.cost_function())
+        return 
+
+
+
+
+board = QueensBoard(4)
 board.create_board()
 start_time = time.time()
-solutions = board.breadth_first_search()
+# solutions = board.breadth_first_search()
+board.hillclimb()
 print("time taken: %s" % (time.time() - start_time), " seconds")
-print("number of solutions: ", solutions)
+# print("number of solutions: ", solutions)
