@@ -1,65 +1,31 @@
 from queue import Queue
 import copy
 import time
+from queens_board import QueensBoard
 
-#function to create a new N-Queens board of N x N size
-def create_new_n_board(n):
-    queens = [[0 for i in range(n)] for j in range(n)]
-    begin = {
-        "queens": queens,
-        "row": 0,
-        "x_coordinate": [0 for i in range(n)],
-    }
-    return begin
-
-#function to print the N-Queens Board
-def print_board(board):
-    for i in range(len(board)):
-            print(board[i])
-    print()
-
-#function to check if board == goal state
-def check_n_queens(state):
-    num = state["row"]
-    q_coords = state["x_coordinate"]
-    #for every queen on the board, check against every other queen
-    for i in range(num):
-        for j in range(i + 1, num):
-            #check if queens are clashing
-            if(q_coords[i] == q_coords[j]):
-                return False
-            else:
-            #check diagonals
-                x_dist = abs(q_coords[i] - q_coords[j])
-                y_dist = abs(i - j)
-                #gradient = rise / run - if gradient == 1, then queens are on same diagonal
-                gradient = y_dist / x_dist
-                if(abs(gradient) == 1):
-                    return False
-    return True
-
-def breadth_first_search(board, n):
+def breadth_first_search(Board):
     number_solutions = 0
-    #1 value to denote a queen placed on a board of 0's
+    # value to denote a queen placed on a board of 0's
     queen = 1
-    #dict object to store all visited boards
+
+    #positions object to store all visited boards
     explored = {
-    str(board["queens"]): True,
+        str(Board.queens): True,
     }
 
     #create Queue data structure for BFS and add initial board to the queue
     queue = Queue()
-    queue.put(board)
+    queue.put(Board)
 
     while not queue.empty():
         #get the next state in the queue, get it's individual values to manipulate
         current_state = queue.get()
-        current_queens = current_state["queens"]
-        current_row = current_state["row"]
-        current_coords = current_state["x_coordinate"]
-        
-        for i in range(n):
-            if current_row >= n:
+        current_queens = current_state.queens
+        current_row = current_state.row
+        current_coords = current_state.x_coordinate
+
+        for i in range(Board.n):
+            if current_row >= Board.n:
                 continue
             # copy the current board and placed queen coordinates into new data structures
             new_queens = copy.deepcopy(current_queens)
@@ -68,37 +34,35 @@ def breadth_first_search(board, n):
             # place the new queen on the new board
             new_queens[current_row][i] = queen
             new_coords[current_row] = i
-            
+
             # if this board has already been explored, then do not add back into queue
             if str(new_queens) in explored:
                 continue
 
             #create a new state to go in the queue, add 1 to the row to increment for next time
-            new_state = {
-                "queens": new_queens,
-                "row": current_row + 1,
-                "x_coordinate": new_coords,
-            }
+            new_state = QueensBoard(Board.n,  current_row + 1, new_queens, new_coords)
 
-            if (current_row + 1) == n:
+            if (current_row + 1) == Board.n:
                 #check goal state
-                if check_n_queens(new_state) and n <= 6:
-                    print("goal state!")
-                    print_board(new_state["queens"])
+                result = new_state.bfs_check_collisons()
+                if result and Board.n <= 6:
+                    print("new goal state!")
                     number_solutions += 1
-                elif check_n_queens(new_state):
+                    new_state.print_board()
+                elif result:
                     print("new goal state!")
                     number_solutions += 1
             #add this new board into the queue
             queue.put(new_state)
 
-            #record the current board in the 'explored' dict - make sure not to explore it again
+            #record the current board in the 'explored' positions - make sure not to explore it again
             explored[str(new_queens)] = True
     return number_solutions
 
-begin = create_new_n_board(4)
+board = QueensBoard(6)
+board.create_board()
 start_time = time.time()
-solutions = breadth_first_search(begin, 4)
+solutions = breadth_first_search(board)
 print("time taken: %s" % (time.time() - start_time), " seconds")
 print("number of solutions: ", solutions)
 
