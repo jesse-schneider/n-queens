@@ -4,8 +4,6 @@ import time
 from queens_board import QueensBoard
 
 def hillclimb(QueensBoard, cost):
-    # counter tracks how many times cost doesn't change
-    counter = 0
     # while the board is not solved
     while (cost > 0):
         # get set of configurations within 1 move of current board
@@ -19,11 +17,8 @@ def hillclimb(QueensBoard, cost):
                 #switch current board with the new one
                 QueensBoard = boards[i]
                 cost = QueensBoard.cost
-        # if cost didn't change, add to counter
+        # if cost didn't change -> local max found, exit and restart the board
         if temp_cost == cost:
-            counter += 1
-        # if cost didn't change 5 times, exit and restart the board
-        if counter == 5:
             return cost
     if (cost == 0):
         # solution has been found
@@ -69,7 +64,7 @@ cost = 1
 first = True
 start_time = time.time()
 while (cost > 0):
-    board = QueensBoard(4)
+    board = QueensBoard(8)
     board.create_local_board()
     cost = board.cost_function()
     if first:
