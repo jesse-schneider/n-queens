@@ -58,6 +58,8 @@ class QueensBoard:
                 #check if queens in same row
                 if self.positions[i][0] == self.positions[j][0]:
                     cost += 1
+                if self.positions[i][1] == self.positions[j][1]:
+                    cost += 1
                 #check diagonals
                 x_dist = abs(self.positions[i][0] - self.positions[j][0])
                 y_dist = abs(self.positions[i][1] - self.positions[j][1])
