@@ -64,7 +64,7 @@ cost = 1
 first = True
 start_time = time.time()
 while (cost > 0):
-    board = QueensBoard(8)
+    board = QueensBoard(6)
     board.create_local_board()
     cost = board.cost_function()
     if first:

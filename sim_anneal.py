@@ -62,17 +62,19 @@ def is_valid_move(new_val, n):
     return 0 <= new_val < n
 
 alpha = 0.9
-T = 3
+T = 0.3
 
-board = QueensBoard(20)
+
+
+board = QueensBoard(10)
 board.create_local_board()
 
 start_time = time.time()
 graph = sim_anneal(board, T, alpha)
 print("time taken: %s" % (time.time() - start_time), " seconds")
 
-plt.plot(graph)
-plt.ylabel('Cost')
-plt.show()
+# plt.plot(graph)
+# plt.ylabel('Cost')
+# plt.show()
 
 
