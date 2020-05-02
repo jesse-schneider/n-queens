@@ -41,8 +41,7 @@ def sim_anneal(QueensBoard, T, alpha):
                 if prob < p:
                     QueensBoard = board
                     cost = new_cost
-        T = alpha * T
-        
+        T = alpha * T    
 
 def find_neighbor(Board):
     #find all boards with a queen moved one "move" (either up or down)
@@ -72,9 +71,6 @@ board.create_local_board()
 start_time = time.time()
 graph = sim_anneal(board, T, alpha)
 print("time taken: %s" % (time.time() - start_time), " seconds")
-
-# plt.plot(graph)
-# plt.ylabel('Cost')
-# plt.show()
-
-
+plt.plot(graph)
+plt.ylabel('Cost')
+plt.show()

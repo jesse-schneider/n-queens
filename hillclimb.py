@@ -1,4 +1,3 @@
-import random
 import copy
 import time
 from queens_board import QueensBoard

@@ -1,6 +1,3 @@
-from queue import Queue
-import copy
-import time
 import random
 
 class QueensBoard:
@@ -48,7 +45,6 @@ class QueensBoard:
                     if(abs(gradient) == 1):
                         return False
         return True
-    
     
     def cost_function(self):
         cost = 0
